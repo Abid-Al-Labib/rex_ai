@@ -3,13 +3,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
+import { get_reviews } from '@/services/ReviewService';
 
 interface ReviewCardProps {
   name: string;
   profileImg?: string;
   time: string;
   rating: number;
-  reviewType: 'Positive' | 'Negative' | 'Neutral';
+  // reviewType: "Positive" | "Neutral" | "Mixed" | "Negative";
+  reviewType: string
   status: 'Pending' | 'Approved' | 'Rejected';
   reviewBody: string;
   suggestedReply?: string;
@@ -25,15 +27,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   reviewBody,
   suggestedReply,
 }) => {
+
   return (
     <Card className="relative">
       <CardHeader className="flex flex-row justify-between items-start">
         <div className="flex items-center gap-3">
-          <img
-            src={profileImg || '/default-avatar.png'}
-            alt="profile"
-            className="h-10 w-10 rounded-full object-cover"
-          />
           <div>
             <p className="font-semibold">{name}</p>
             <p className="text-xs text-gray-500">{time}</p>

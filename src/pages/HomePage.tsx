@@ -4,8 +4,41 @@ import ReviewCard from "@/components/custom/ReviewCard"
 import Pagination from "@/components/custom/Pagination"
 import Sidebar from "@/components/custom/Sidebar"
 import TopBar from "@/components/custom/TopBar"
+import { useEffect, useState } from "react"
+import { get_reviews } from "@/services/ReviewService"
+import { ToastContainer, toast } from 'react-toastify';
+import { Review } from "@/types/types"
+import { convertUtcToEasterTime } from "@/services/Helper"
+
 
 const HomePage = () => {
+  
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState<boolean>(false)
+
+  const handleGetReview = async () => {
+    try {
+        const reviews = await get_reviews();  // Await the result from get_reviews
+        if (reviews)
+        {
+          setReviews(reviews)
+        }
+        else
+        {
+          toast.error('Failed to fetch reviews')
+        }
+    } catch (error) {
+        console.error('Error in handlegetreview:', error);  // Handle any error
+    }
+  };
+
+  useEffect(() => {
+    setLoadingReviews(true)
+    handleGetReview()
+    setLoadingReviews(false)
+  }, [])
+  
+
   return (
     <div className="flex flex-col h-screen">
 
@@ -31,16 +64,20 @@ const HomePage = () => {
           </div>
           
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <ReviewCard
-              name="John Doe"
-              profileImg="/avatar-placeholder.jpg"
-              time="2 hours ago"
-              rating={4}
-              reviewType="Positive"
-              status="Pending"
-              reviewBody="Great product! Highly recommend."
-              suggestedReply="Thank you for your kind words!"
-            />
+            {
+              reviews.map((review) => (
+                  <ReviewCard
+                    name={review.author_name || '-'}
+                    profileImg="/avatar-placeholder.jpg"
+                    time={review.review_published_at? convertUtcToEasterTime(review.review_published_at): '-'}
+                    rating={Number(review.rating)}
+                    reviewType={review.sentiment  || '-'}
+                    status="Approved"
+                    reviewBody={review.review_text || '-'}
+                    suggestedReply={review.ai_generated_reply || '-'}
+                  />
+              ))  
+            }
           </div>
 
           <Pagination />
