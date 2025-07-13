@@ -4,7 +4,8 @@ export async function get_reviews() {
     try {
         const { data: reviews, error } = await supabase_client
             .from('reviews')
-            .select('*');
+            .select('*')
+            .order('review_published_at', {ascending: false});
 
         if (error) {
             throw error; 
